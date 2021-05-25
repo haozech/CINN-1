@@ -641,18 +641,18 @@ bool ComputeAtRelation::IsCompatible(Stage *self) {
 }
 
 void Stage::Vectorize(int level, int factor) {
-  AssertAxisIsNotLocked(level);
   CHECK_LT(level, n_out_dims());
   CHECK_GT(factor, 0);
   auto dim_name = ith_dim_name(level);
-  vectorize_info_.set(level /*inner*/, factor);
+  Vectorize(dim_name, factor);
 }
 
 void Stage::Vectorize(const std::string &axis, int factor) {
   auto dims = isl_get_dim_names(transformed_domain());
   auto it   = std::find(dims.begin(), dims.end(), axis);
   CHECK(it != dims.end()) << "No dimension called " << axis;
-  Vectorize(std::distance(dims.begin(), it), factor);
+  AssertAxisIsNotLocked(std::distance(dims.begin(), it));
+  vectorize_info_.set(axis /*inner*/, factor);
 }
 
 void Stage::Vectorize(const Iterator &axis, int factor) { return Vectorize(axis.id, factor); }
